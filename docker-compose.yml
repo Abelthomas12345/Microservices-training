@@ -1,0 +1,61 @@
+version: '3.9'
+
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      - USERS_SERVICE_URL=http://users-service:8000
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8000
+      - CONTACT_SERVICE_URL=http://contact-service:8000
+    depends_on:
+      - users-service
+      - contact-service
+      - notification-service
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  users-service:
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+
+    environment:
+      - SERVICE_PORT=8000
+      - DATABASE_URL=sqlite:///users_db.sqlite
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  notification-service:
+    build:
+      context: ./notification-service
+      dockerfile: Dockerfile
+
+    environment:
+      - SERVICE_PORT=8000
+      # - DATABASE_URL=sqlite:///notification_db.sqlite
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+  contact-service:
+    build:
+      context: ./contact-service
+      dockerfile: Dockerfile
+
+    environment:
+      - SERVICE_PORT=8000
+      - DATABASE_URL=sqlite:///contact_db.sqlite
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8000
+    networks:
+      - microservices-network
+    restart: unless-stopped
+
+networks:
+  microservices-network:
+    driver: bridge
