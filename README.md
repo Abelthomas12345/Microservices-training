@@ -179,9 +179,7 @@ POST | /notify/ | Réception d’une notification (appel interne)
 1. Créer un utilisateur
 
 ```bash
-curl -X POST http://localhost:8000/users/ \
-  -H "Content-Type: application/json" \
-  -d '{"first_name":"Jean","last_name":"Dupont","email":"jean@mail.com"}'
+Invoke-RestMethod -Uri "http://localhost:8000/users/" -Method Post -ContentType "application/json" -Body '{"first_name":"Jean","last_name":"Dupont","email":"jean@mail.com"}'
 ```
 
 Réponse attendue :
@@ -201,9 +199,7 @@ Réponse attendue :
 2. Créer un contact (déclenche la notification)
 
 ```bash
-curl -X POST http://localhost:8000/contacts/ \
-  -H "Content-Type: application/json" \
-  -d '{"name":"Marie Curie","email":"marie@mail.com","company":"Institut"}'
+Invoke-RestMethod -Uri "http://localhost:8000/contacts/" -Method Post -ContentType "application/json" -Body '{"name":"Marie Curie","email":"marie@mail.com","company":"Institut"}'
 ```
 
 Réponse attendue :
