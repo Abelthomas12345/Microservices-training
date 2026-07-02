@@ -1,6 +1,19 @@
 version: '3.9'
 
 services:
+ # ========== RABBITMQ (communication queue) ==========
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: guest
+      RABBITMQ_DEFAULT_PASS: guest
+    ports:
+      - "5672:5672"   # Port AMQP (Celery)
+      - "15672:15672" # Interface de gestion (optionnel)
+    networks:
+      - microservices-network
+    restart: unless-stopped
   api-gateway:
     build:
       context: ./api-gateway
@@ -14,7 +27,6 @@ services:
     depends_on:
       - users-service
       - contact-service
-      - notification-service
     networks:
       - microservices-network
     restart: unless-stopped
@@ -31,6 +43,7 @@ services:
       - microservices-network
     restart: unless-stopped
 
+ # ========== NOTIFICATION SERVICE (avec Celery) ==========
   notification-service:
     build:
       context: ./notification-service
@@ -38,10 +51,18 @@ services:
 
     environment:
       - SERVICE_PORT=8000
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
       # - DATABASE_URL=sqlite:///notification_db.sqlite
+    depends_on:
+      - rabbitmq
     networks:
       - microservices-network
     restart: unless-stopped
+    # Lance le serveur + le worker Celery
+    command: >
+      sh -c "python manage.py migrate &&
+             python manage.py runserver 0.0.0.0:8000 &
+             celery -A config worker --loglevel=info -Q notifications "
 
   contact-service:
     build:
@@ -52,9 +73,24 @@ services:
       - SERVICE_PORT=8000
       - DATABASE_URL=sqlite:///contact_db.sqlite
       - NOTIFICATION_SERVICE_URL=http://notification-service:8000
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
+    depends_on:
+      - notification-service
+      - rabbitmq
     networks:
       - microservices-network
     restart: unless-stopped
+     # Lance le serveur + le worker Celery
+    command: >
+      sh -c "
+        python manage.py migrate &&
+        python manage.py runserver 0.0.0.0:8000 &
+        # celery -A config worker
+        #         --loglevel=info
+        #         --without-gossip
+        #         --without-mingle
+        #         --without-heartbeat
+      "
 
 networks:
   microservices-network:
