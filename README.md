@@ -199,7 +199,7 @@ Réponse attendue :
 2. Créer un contact (déclenche la notification)
 
 ```bash
-Invoke-RestMethod -Uri "http://localhost:8002/contacts/  -Method Post -ContentType "application/json" -Body '{"name":"Marie Curie","email":"marie@mail.com","company":"Institut"}'
+Invoke-RestMethod -Uri "http://localhost:8002/contacts/"  -Method Post -ContentType "application/json" -Body '{"name":"Marie Curie","email":"marie@mail.com","company":"Institut"}'
 ```
 
 Réponse attendue :
