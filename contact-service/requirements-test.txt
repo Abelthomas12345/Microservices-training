@@ -1,0 +1,9 @@
+# Dépendances de test - contact-service
+# Installation : pip install -r requirements.txt -r requirements-test.txt
+-r requirements.txt
+
+pytest==9.0.2
+pytest-django==4.12.0
+pact-python==3.4.0
+requests-mock==1.12.1
+coverage==7.15.0

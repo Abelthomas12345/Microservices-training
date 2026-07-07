@@ -1,0 +1,4 @@
+# Dépendances pour la suite de tests d'intégration inter-services (racine du dépôt).
+# Cette suite ne nécessite PAS Django : elle parle aux services uniquement en HTTP.
+pytest==9.0.2
+requests==2.32.4
