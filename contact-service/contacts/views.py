@@ -18,15 +18,15 @@ class ContactListCreateView(generics.ListCreateAPIView):
         # 2. Communication HTTP (envoide synchrone) vers le notification-service
         notification_url = os.getenv('NOTIFICATION_SERVICE_URL', 'http://localhost:8003')
         try:
-            # response = requests.post(
-            #     f"{notification_url}/notify/",
-            #     json={"contact_id": contact.id, "name": contact.name},
-            #     timeout=2
-            result = NotificationClient().notify_contact_created(
-                contact_id = contact.id, contact_name = contact.name
+            response = requests.post(
+                f"{notification_url}/notify/",
+                json={"contact_id": contact.id, "name": contact.name},
+                timeout=2
+            # result = NotificationClient().notify_contact_created(
+            #     contact_id = contact.id, contact_name = contact.name
             )
             
-            print(f"✅ [HTTP] Notification envoyée: {result}")
+            print(f"✅ [HTTP] Notification envoyée: {response.status_code}")
         except Exception as e:
             print(f"⚠️ [HTTP] Erreur notification: {e}")
         
