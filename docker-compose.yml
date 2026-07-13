@@ -6,8 +6,8 @@ services:
     image: rabbitmq:3.13-management
     container_name: rabbitmq
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: RABBITMQ_USER
+      RABBITMQ_DEFAULT_PASS: RABBITMQ_PASSWORD
     ports:
       - "5672:5672"   # Port AMQP (Celery)
       - "15672:15672" # Interface de gestion (optionnel)
@@ -24,6 +24,10 @@ services:
       - USERS_SERVICE_URL=http://users-service:8000
       - NOTIFICATION_SERVICE_URL=http://notification-service:8000
       - CONTACT_SERVICE_URL=http://contact-service:8000
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY_GATEWAY}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=users-service,localhost
+      
     depends_on:
       - users-service
       - contact-service
@@ -39,6 +43,11 @@ services:
     environment:
       - SERVICE_PORT=8000
       - DATABASE_URL=sqlite:///users_db.sqlite
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY_USERS}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=users-service,localhost
+
+
     networks:
       - microservices-network
     restart: unless-stopped
@@ -52,6 +61,10 @@ services:
     environment:
       - SERVICE_PORT=8000
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY_NOTIFICATIONS}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=notification-service,localhost
+
       # - DATABASE_URL=sqlite:///notification_db.sqlite
     depends_on:
       - rabbitmq
@@ -74,6 +87,9 @@ services:
       - DATABASE_URL=sqlite:///contact_db.sqlite
       - NOTIFICATION_SERVICE_URL=http://notification-service:8000
       - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672//
+      - DJANGO_SECRET_KEY=${DJANGO_SECRET_KEY_CONTACTS}
+      - DJANGO_DEBUG=${DJANGO_DEBUG}
+      - DJANGO_ALLOWED_HOSTS=contact-service,localhost
     depends_on:
       - notification-service
       - rabbitmq
