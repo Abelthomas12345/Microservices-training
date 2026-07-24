@@ -107,7 +107,7 @@ cd contact-service
 set NOTIFICATION_SERVICE_URL=http://localhost:8003   # Windows CMD
 # ou
 $env:NOTIFICATION_SERVICE_URL="http://localhost:8003"   # PowerShell
-py manage.py runserver 8002
+
 ```
 
 Terminal 4 – API Gateway
